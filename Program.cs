@@ -1,65 +1,268 @@
 using System;
 using System.Collections.Generic;
 
+// ==================== PLAYER ====================
+
+class Player
+{
+    public string Name { get; set; }
+    public int HP { get; set; }
+    public Weapon CurrentWeapon { get; set; }
+
+    public List<Item> Inventory { get; set; }
+
+    public Dictionary<string, int> Stats { get; set; }
+
+    public Player(string name)
+    {
+        Name = name;
+        HP = 100;
+
+        CurrentWeapon = new Weapon("Sword", 20);
+
+        Inventory = new List<Item>();
+        Stats = new Dictionary<string, int>();
+
+        Stats["Strength"] = 10;
+        Stats["Defense"] = 5;
+    }
+
+    public void Attack(Enemy enemy)
+    {
+        Console.WriteLine(
+            $"{Name} атакує {enemy.Name} зброєю {CurrentWeapon.Name}!"
+        );
+
+        enemy.HP -= CurrentWeapon.Damage;
+
+        if (enemy.HP < 0)
+            enemy.HP = 0;
+
+        Console.WriteLine(
+            $"{enemy.Name} отримав {CurrentWeapon.Damage} dmg."
+        );
+    }
+
+    public void ShowStats()
+    {
+        Console.WriteLine("\n=== ХАРАКТЕРИСТИКИ ===");
+        Console.WriteLine($"Ім'я: {Name}");
+        Console.WriteLine($"HP: {HP}");
+        Console.WriteLine($"Зброя: {CurrentWeapon.Name}");
+
+        Console.WriteLine("Stats:");
+
+        foreach (var stat in Stats)
+        {
+            Console.WriteLine($"{stat.Key}: {stat.Value}");
+        }
+
+        Console.WriteLine("\nІнвентар:");
+
+        if (Inventory.Count == 0)
+        {
+            Console.WriteLine("Пусто");
+        }
+        else
+        {
+            foreach (Item item in Inventory)
+            {
+                Console.WriteLine($"- {item.Name}");
+            }
+        }
+    }
+
+    public void UsePotion()
+    {
+        foreach (Item item in Inventory)
+        {
+            if (item.Name == "Health Potion")
+            {
+                HP += item.Value;
+
+                if (HP > 100)
+                    HP = 100;
+
+                Inventory.Remove(item);
+
+                Console.WriteLine(
+                    $"Ви використали зілля. HP: {HP}"
+                );
+
+                return;
+            }
+        }
+
+        Console.WriteLine("У вас немає зілля.");
+    }
+}
+
+
+// ==================== ENEMY ====================
+
+class Enemy
+{
+    public string Name { get; set; }
+    public int HP { get; set; }
+    public int Damage { get; set; }
+
+    public Enemy(string name, int hp, int damage)
+    {
+        Name = name;
+        HP = hp;
+        Damage = damage;
+    }
+
+    public void Attack(Player player)
+    {
+        Console.WriteLine($"{Name} атакує!");
+
+        player.HP -= Damage;
+
+        if (player.HP < 0)
+            player.HP = 0;
+
+        Console.WriteLine(
+            $"{Name} завдав {Damage} шкоди."
+        );
+    }
+}
+
+
+// ==================== WEAPON ====================
+
+class Weapon
+{
+    public string Name { get; set; }
+    public int Damage { get; set; }
+
+    public Weapon(string name, int damage)
+    {
+        Name = name;
+        Damage = damage;
+    }
+}
+
+
+// ==================== ITEM ====================
+
+class Item
+{
+    public string Name { get; set; }
+    public int Value { get; set; }
+
+    public Item(string name, int value)
+    {
+        Name = name;
+        Value = value;
+    }
+}
+
+
+// ==================== QUEST ====================
+
 class Quest
 {
-    public string Name;
-    public bool Completed;
+    public string Name { get; set; }
+    public bool IsCompleted { get; set; }
 
     public Quest(string name)
     {
         Name = name;
-        Completed = false;
+        IsCompleted = false;
     }
 }
+
+
+// ==================== INVENTORY ====================
 
 class Inventory
 {
-    public List<Item> items = new List<Item>();
+    public List<Item> Items { get; set; }
+
+    public Inventory()
+    {
+        Items = new List<Item>();
+    }
 
     public void AddItem(Item item)
     {
-        items.Add(item);
+        Items.Add(item);
+        Console.WriteLine($"Отримано: {item.Name}");
     }
 }
+
+
+// ==================== PROGRAM ====================
 
 class Program
 {
     static void Main()
     {
+        // Створення гравця
         Player player = new Player("Knight");
-        Enemy goblin = new Enemy("Goblin", 60, 10);
 
-        List<Item> inventory = new List<Item>();
-        inventory.Add(new Item("Health Potion", 30));
+        // Додавання зілля
+        player.Inventory.Add(
+            new Item("Health Potion", 30)
+        );
 
-        Dictionary<string, int> stats = new Dictionary<string, int>();
-        stats["Strength"] = 10;
-        stats["Defense"] = 5;
-
+        // Створення черги ворогів
         Queue<Enemy> enemies = new Queue<Enemy>();
-        enemies.Enqueue(goblin);
 
-        HashSet<string> completedQuests = new HashSet<string>();
+        enemies.Enqueue(
+            new Enemy("Goblin", 60, 10)
+        );
 
-        Quest quest = new Quest("Defeat Goblin");
+        enemies.Enqueue(
+            new Enemy("Orc", 100, 15)
+        );
 
-        int choice = 0;
+        enemies.Enqueue(
+            new Enemy("Skeleton", 50, 8)
+        );
 
-        while (choice != 0 && player.HP > 0 && enemies.Count > 0)
+        // Множина виконаних квестів
+        HashSet<string> completedQuests =
+            new HashSet<string>();
+
+        // Зброя
+        Weapon sword = new Weapon("Sword", 20);
+        Weapon axe = new Weapon("Axe", 30);
+
+        player.CurrentWeapon = sword;
+
+        // Основний цикл гри
+        while (player.HP > 0 && enemies.Count > 0)
         {
             Enemy enemy = enemies.Peek();
 
             Console.Clear();
 
-            Console.WriteLine("=== RPG BATTLE ===");
+            Console.WriteLine("=== RPG BATTLE ===\n");
+
+            Console.WriteLine(
+                $"Гравець: {player.Name}"
+            );
+
+            Console.WriteLine(
+                $"HP: {player.HP}"
+            );
+
+            Console.WriteLine(
+                $"Зброя: {player.CurrentWeapon.Name}"
+            );
+
             Console.WriteLine();
-            Console.WriteLine("Гравець: " + player.Name);
-            Console.WriteLine("HP: " + player.HP);
-            Console.WriteLine("Зброя: " + player.CurrentWeapon.Name);
-            Console.WriteLine();
-            Console.WriteLine("Ворог: " + enemy.Name);
-            Console.WriteLine("HP: " + enemy.HP);
+
+            Console.WriteLine(
+                $"Ворог: {enemy.Name}"
+            );
+
+            Console.WriteLine(
+                $"HP: {enemy.HP}"
+            );
+
             Console.WriteLine();
 
             Console.WriteLine("1. Атакувати");
@@ -68,94 +271,115 @@ class Program
             Console.WriteLine("4. Показати характеристики");
             Console.WriteLine("0. Вийти");
 
-            Console.Write("Ваш вибір: ");
-            choice = Convert.ToInt32(Console.ReadLine());
+            Console.Write("\nВаш вибір: ");
 
-            if (choice == 1)
+            string choice = Console.ReadLine();
+
+            switch (choice)
             {
-                player.Attack(enemy);
+                case "1":
+                    player.Attack(enemy);
 
-                if (enemy.HP <= 0)
-                {
-                    Console.WriteLine("Goblin переможений!");
-                    enemies.Dequeue();
-
-                    quest.Completed = true;
-                    completedQuests.Add(quest.Name);
-                }
-                else
-                {
-                    enemy.Attack(player);
-                }
-
-                Console.ReadKey();
-            }
-
-            if (choice == 2)
-            {
-                if (inventory.Count > 0)
-                {
-                    player.HP += inventory[0].Value;
-
-                    if (player.HP > 100)
+                    // Якщо ворог помер
+                    if (enemy.HP <= 0)
                     {
-                        player.HP = 100;
+                        Console.WriteLine(
+                            $"{enemy.Name} переможений!"
+                        );
+
+                        enemies.Dequeue();
+
+                        // Завершення квесту
+                        if (enemies.Count == 0)
+                        {
+                            completedQuests.Add(
+                                "Defeat all enemies"
+                            );
+                        }
+                    }
+                    else
+                    {
+                        // Ворог атакує у відповідь
+                        enemy.Attack(player);
                     }
 
-                    Console.WriteLine("Ви використали зілля.");
-                    inventory.RemoveAt(0);
-                }
-                else
-                {
-                    Console.WriteLine("Зіль немає.");
-                }
+                    Console.ReadKey();
+                    break;
 
-                Console.ReadKey();
-            }
 
-            if (choice == 3)
-            {
-                if (player.CurrentWeapon.Name == "Sword")
-                {
-                    player.CurrentWeapon = new Weapon("Axe", 30);
-                }
-                else
-                {
-                    player.CurrentWeapon = new Weapon("Sword", 20);
-                }
+                case "2":
+                    player.UsePotion();
 
-                Console.WriteLine(
-                    "Ви змінили зброю на " +
-                    player.CurrentWeapon.Name
-                );
+                    Console.ReadKey();
+                    break;
 
-                Console.ReadKey();
-            }
 
-            if (choice == 4)
-            {
-                Console.WriteLine();
-                Console.WriteLine("=== ХАРАКТЕРИСТИКИ ===");
-                Console.WriteLine("Strength: " + stats["Strength"]);
-                Console.WriteLine("Defense: " + stats["Defense"]);
-                Console.WriteLine("Предметів: " + inventory.Count);
-                Console.WriteLine("Виконаних квестів: " + completedQuests.Count);
+                case "3":
+                    if (player.CurrentWeapon == sword)
+                    {
+                        player.CurrentWeapon = axe;
+                    }
+                    else
+                    {
+                        player.CurrentWeapon = sword;
+                    }
 
-                Console.ReadKey();
+                    Console.WriteLine(
+                        $"Ви взяли: {player.CurrentWeapon.Name}"
+                    );
+
+                    Console.ReadKey();
+                    break;
+
+
+                case "4":
+                    player.ShowStats();
+
+                    Console.WriteLine(
+                        $"\nВиконаних квестів: {completedQuests.Count}"
+                    );
+
+                    Console.ReadKey();
+                    break;
+
+
+                case "0":
+                    Console.WriteLine(
+                        "Ви вийшли з гри."
+                    );
+
+                    return;
+
+
+                default:
+                    Console.WriteLine(
+                        "Невірний вибір!"
+                    );
+
+                    Console.ReadKey();
+                    break;
             }
         }
+
+        Console.Clear();
 
         if (player.HP <= 0)
         {
-            Console.WriteLine("Ви програли!");
-        }
-        else if (enemies.Count == 0)
-        {
-            Console.WriteLine("Ви перемогли!");
+            Console.WriteLine("=== GAME OVER ===");
+            Console.WriteLine("Ви загинули.");
         }
         else
         {
-            Console.WriteLine("Гру завершено.");
+            Console.WriteLine("=== VICTORY ===");
+            Console.WriteLine(
+                "Ви перемогли!"
+            );
+
+            Console.WriteLine(
+                $"Виконаний квест: Defeat all enemies"
+            );
         }
+
+        Console.ReadKey();
     }
 }
