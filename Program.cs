@@ -55,13 +55,9 @@ namespace RPG_Battle
 
             player.CurrentWeapon = sword;
 
-            int choice = 0;
+            int choice;
 
-            while (
-                player.HP > 0 &&
-                enemies.Count > 0 &&
-                choice != 0
-            )
+            while (player.HP > 0 && enemies.Count > 0)
             {
                 Enemy enemy = enemies.Peek();
 
@@ -175,7 +171,7 @@ namespace RPG_Battle
                             "Ви вийшли з гри."
                         );
 
-                        break;
+                        return;
 
                     default:
                         Console.WriteLine(
