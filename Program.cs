@@ -20,16 +20,21 @@ namespace RPG_Battle
 
             Queue<Enemy> enemies = new Queue<Enemy>();
 
+            // Задіюємо нові класи ворогів
             enemies.Enqueue(
-                new Enemy("Goblin", 60, 10)
+                new Goblin("Goblin Sentry", 60, 10, 8, "Dagger")
             );
 
             enemies.Enqueue(
-                new Enemy("Orc", 100, 15)
+                new Orc("Orc Warrior", 100, 15, 25, "Iron Skull")
             );
 
             enemies.Enqueue(
-                new Enemy("Skeleton", 50, 8)
+                new Skeleton("Skeleton Archer", 50, 8, "Frost")
+            );
+
+            enemies.Enqueue(
+                new Dragon("Ancient Dragon", 200, 25, 40)
             );
 
             HashSet<string> completedQuests =
@@ -81,12 +86,30 @@ namespace RPG_Battle
                 Console.WriteLine();
 
                 Console.WriteLine(
-                    $"Ворог: {enemy.Name}"
+                    $"Ворог: {enemy.Name} [{enemy.GetType().Name}]"
                 );
 
                 Console.WriteLine(
-                    $"HP: {enemy.HP}"
+                    $"HP: {enemy.HP} | Броня: {enemy.Armor} | Рівень: {enemy.Level}"
                 );
+
+                // Вивід унікальних властивостей залежно від конкретного класу ворога
+                if (enemy is Goblin goblin)
+                {
+                    Console.WriteLine($"Стелс: {goblin.Stealth} | Зброя: {goblin.WeaponType}");
+                }
+                else if (enemy is Orc orc)
+                {
+                    Console.WriteLine($"Лють (Rage): {orc.Rage} | Клан: {orc.ClanName}");
+                }
+                else if (enemy is Skeleton skeleton)
+                {
+                    Console.WriteLine($"Кістяний щит: {skeleton.BoneShield} | Стихія: {skeleton.ElementType}");
+                }
+                else if (enemy is Dragon dragon)
+                {
+                    Console.WriteLine($"Сила вогню: {dragon.FirePower} | Здібності: {string.Join(", ", dragon.SpecialAbilities)}");
+                }
 
                 Console.WriteLine();
 
