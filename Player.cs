@@ -3,21 +3,17 @@ using System.Collections.Generic;
 
 namespace RPG_Battle
 {
-    public class Player
+    public class Player : Character
     {
-        public string Name { get; set; }
-        public int HP { get; set; }
         public Weapon CurrentWeapon { get; set; }
 
-        public List<Item> Inventory { get; set; }
+        public List<Item> Inventory { get; private set; }
 
-        public Dictionary<string, int> Stats { get; set; }
+        public Dictionary<string, int> Stats { get; private set; }
 
         public Player(string name)
+            : base(name, 100)
         {
-            Name = name;
-            HP = 100;
-
             CurrentWeapon = new Weapon(
                 "Sword",
                 20,
@@ -33,25 +29,20 @@ namespace RPG_Battle
             Stats["Defense"] = 5;
         }
 
-        public void Attack(Enemy enemy)
+        public override void Attack(Character target)
         {
             if (CurrentWeapon.Durability > 0)
             {
                 Console.WriteLine(
-                    $"{Name} атакує {enemy.Name} зброєю {CurrentWeapon.Name}!"
+                    $"{Name} атакує {target.Name} зброєю {CurrentWeapon.Name}!"
                 );
 
-                enemy.HP -= CurrentWeapon.Damage;
+                target.TakeDamage(CurrentWeapon.Damage);
 
-                if (enemy.HP < 0)
-                {
-                    enemy.HP = 0;
-                }
-
-                CurrentWeapon.Durability--;
+                CurrentWeapon.DecreaseDurability();
 
                 Console.WriteLine(
-                    $"{enemy.Name} отримав {CurrentWeapon.Damage} шкоди."
+                    $"{target.Name} отримав {CurrentWeapon.Damage} шкоди."
                 );
             }
             else
@@ -60,7 +51,7 @@ namespace RPG_Battle
             }
         }
 
-        public void ShowStats()
+        public override void ShowInfo()
         {
             Console.WriteLine("\n=== ХАРАКТЕРИСТИКИ ===");
             Console.WriteLine($"Ім'я: {Name}");
@@ -98,12 +89,7 @@ namespace RPG_Battle
             {
                 if (item.Type == "Potion")
                 {
-                    HP += item.Value;
-
-                    if (HP > 100)
-                    {
-                        HP = 100;
-                    }
+                    Heal(item.Value);
 
                     Console.WriteLine(
                         $"Ви використали {item.Name}. HP: {HP}"

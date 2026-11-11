@@ -5,10 +5,10 @@ namespace RPG_Battle
 {
     public class Item
     {
-        public string Name { get; set; }
-        public string Type { get; set; }
-        public int Value { get; set; }
-        public int Price { get; set; }
+        public string Name { get; private set; }
+        public string Type { get; private set; }
+        public int Value { get; private set; }
+        public int Price { get; private set; }
 
         public List<string> Effects { get; set; }
         public Dictionary<string, int> Stats { get; set; }

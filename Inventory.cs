@@ -5,7 +5,7 @@ namespace RPG_Battle
 {
     public class Inventory
     {
-        public List<Item> Items { get; set; }
+        public List<Item> Items { get; private set; }
 
         public Inventory()
         {

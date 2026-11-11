@@ -5,10 +5,10 @@ namespace RPG_Battle
 {
     public class Weapon
     {
-        public string Name { get; set; }
-        public int Damage { get; set; }
-        public int Durability { get; set; }
-        public string Type { get; set; }
+        public string Name { get; private set; }
+        public int Damage { get; private set; }
+        public int Durability { get; private set; }
+        public string Type { get; private set; }
 
         public List<string> Effects { get; set; }
         public Dictionary<string, int> Stats { get; set; }
@@ -38,6 +38,14 @@ namespace RPG_Battle
             else
             {
                 Console.WriteLine($"{Name} зламана!");
+            }
+        }
+
+        public void DecreaseDurability()
+        {
+            if (Durability > 0)
+            {
+                Durability--;
             }
         }
 

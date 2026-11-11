@@ -85,31 +85,8 @@ namespace RPG_Battle
 
                 Console.WriteLine();
 
-                Console.WriteLine(
-                    $"Ворог: {enemy.Name} [{enemy.GetType().Name}]"
-                );
-
-                Console.WriteLine(
-                    $"HP: {enemy.HP} | Броня: {enemy.Armor} | Рівень: {enemy.Level}"
-                );
-
-                // Вивід унікальних властивостей залежно від конкретного класу ворога
-                if (enemy is Goblin goblin)
-                {
-                    Console.WriteLine($"Стелс: {goblin.Stealth} | Зброя: {goblin.WeaponType}");
-                }
-                else if (enemy is Orc orc)
-                {
-                    Console.WriteLine($"Лють (Rage): {orc.Rage} | Клан: {orc.ClanName}");
-                }
-                else if (enemy is Skeleton skeleton)
-                {
-                    Console.WriteLine($"Кістяний щит: {skeleton.BoneShield} | Стихія: {skeleton.ElementType}");
-                }
-                else if (enemy is Dragon dragon)
-                {
-                    Console.WriteLine($"Сила вогню: {dragon.FirePower} | Здібності: {string.Join(", ", dragon.SpecialAbilities)}");
-                }
+                // кожен ворог сам виводить свою інформацію
+                enemy.ShowInfo();
 
                 Console.WriteLine();
 
@@ -121,9 +98,10 @@ namespace RPG_Battle
 
                 Console.Write("\nВаш вибір: ");
 
-                choice = Convert.ToInt32(
-                    Console.ReadLine()
-                );
+                if (!int.TryParse(Console.ReadLine(), out choice))
+                {
+                    choice = -1;
+                }
 
                 switch (choice)
                 {
@@ -140,7 +118,7 @@ namespace RPG_Battle
 
                             if (enemies.Count == 0)
                             {
-                                quest.IsCompleted = true;
+                                quest.Complete();
 
                                 completedQuests.Add(
                                     quest.Name
@@ -179,7 +157,7 @@ namespace RPG_Battle
                         break;
 
                     case 4:
-                        player.ShowStats();
+                        player.ShowInfo();
 
                         Console.WriteLine(
                             $"\nВиконаних квестів: " +
